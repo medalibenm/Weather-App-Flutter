@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:real_weather_app/services/coordonnees.dart';
+import 'package:real_weather_app/services/weather_api.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -9,8 +11,34 @@ void main() {
   ));
 }
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  String searchtext = '';
+  Coord inst = Coord(name: '');
+  Weather inst2 = Weather(name: '', lat: 0, lon: 0, apikey: '');
+  bool isLoading = false;
+
+  void getdata(String searchController) async {
+    print('Start');
+    setState(() {
+      isLoading = true;
+    });
+    searchtext = searchController;
+    inst = Coord(name: searchtext);
+    await inst.get_name();
+    inst2 = Weather(
+        name: inst.name, lat: inst.lat, lon: inst.lon, apikey: inst.apikey);
+    await inst2.get_weather();
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,272 +57,279 @@ class Home extends StatelessWidget {
             0.47,
             1
           ])),
-          child: ListView(
-            children: [
-              Header(),
-              Container(
-                child: Column(
+          child: isLoading
+              ? Center(child: CircularProgressIndicator())
+              : ListView(
                   children: [
-                    Image.asset(
-                      'assets/Design sans titre (6).png',
-                      width: 300,
-                      fit: BoxFit.contain,
+                    Header(
+                      inst2: inst2,
+                      getdata: getdata,
                     ),
-                    Text(
-                      '30º',
-                      style: GoogleFonts.poppins(
-                          fontSize: 60,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white),
-                    ),
-                    Text(
-                      'Precipitations',
-                      style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w300),
-                    ),
-                    Text(
-                      'Max.: 34º Min.: 28º',
-                      style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w300),
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Stack(
-                      children: [
-                        Align(
-                          alignment: Alignment.center,
-                          child: Opacity(
-                            opacity: 0.25,
-                            child: Container(
-                              height: 47,
-                              width: 343,
-                              decoration: BoxDecoration(
-                                color: Color(0xff104084),
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(
-                                        0.2), // Darker shadow color
-                                    spreadRadius: 1,
-                                    blurRadius: 6,
-                                    offset: Offset(
-                                        0, 3), // Move the shadow down by 3
-                                  ),
-                                ],
-                              ),
-                            ),
+                    Container(
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            'assets/Design sans titre (6).png',
+                            width: 300,
+                            fit: BoxFit.contain,
                           ),
-                        ),
-                        Align(
-                          child: Container(
-                            width: 343,
-                            height: 47,
-                            child: Row(children: [
-                              Flexible(
-                                  flex: 1,
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(
-                                            'assets/noun-rain-2438520 1.svg'),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Text(
-                                          '18%',
-                                          style: GoogleFonts.poppins(
-                                              color: Colors.white),
-                                        ),
-                                      ])),
-                              Flexible(
-                                  flex: 1,
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset('assets/Group.svg'),
-                                        SizedBox(
-                                          width: 7,
-                                        ),
-                                        Text(
-                                          '67%',
-                                          style: GoogleFonts.poppins(
-                                              color: Colors.white),
-                                        ),
-                                      ])),
-                              Flexible(
-                                  flex: 1,
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(
-                                            'assets/noun-wind-4507827 1.svg'),
-                                        SizedBox(
-                                          width: 7,
-                                        ),
-                                        Text(
-                                          '25km/h',
-                                          style: GoogleFonts.poppins(
-                                              color: Colors.white),
-                                        ),
-                                      ])),
-                            ]),
+                          Text(
+                            '${inst2.temp.toInt()}º',
+                            style: GoogleFonts.poppins(
+                                fontSize: 60,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white),
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 14,
-                    ),
-                    Stack(
-                      children: [
-                        Align(
-                          alignment: Alignment.center,
-                          child: Opacity(
-                            opacity: 0.25,
-                            child: Container(
-                              height: 235,
-                              width: 343,
-                              decoration: BoxDecoration(
-                                color: Color(0xff104084),
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(
-                                        0.2), // Darker shadow color
-                                    spreadRadius: 1,
-                                    blurRadius: 6,
-                                    offset: Offset(
-                                        0, 3), // Move the shadow down by 3
-                                  ),
-                                ],
-                              ),
-                            ),
+                          Text(
+                            'Precipitations',
+                            style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w300),
                           ),
-                        ),
-                        Align(
-                          child: Container(
-                              height: 220,
-                              width: 343,
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Text(
-                                        'Today',
-                                        style: GoogleFonts.poppins(
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      SizedBox(
-                                        width: 90,
-                                      ),
-                                      Text(
-                                        'Mar, 10',
-                                        style: GoogleFonts.poppins(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w300),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 15,
-                                  ),
-                                  Row(
-                                    children: [
-                                      HoursWidget(),
-                                      HoursWidget(),
-                                      HoverWidget(),
-                                      HoursWidget(),
-                                    ],
-                                  ),
-                                ],
-                              )),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Stack(children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Opacity(
-                          opacity: 0.25,
-                          child: Container(
-                            height: 170,
-                            width: 343,
-                            decoration: BoxDecoration(
-                              color: Color(0xff104084),
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black
-                                      .withOpacity(0.2), // Darker shadow color
-                                  spreadRadius: 1,
-                                  blurRadius: 6,
-                                  offset:
-                                      Offset(0, 3), // Move the shadow down by 3
-                                ),
-                              ],
-                            ),
+                          Text(
+                            'Max.: ${inst2.maxtemp.toInt()}º Min.: ${inst2.mintemp.toInt()}º',
+                            style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w300),
                           ),
-                        ),
-                      ),
-                      Align(
-                          child: Container(
-                        height: 170,
-                        width: 343,
-                        child: Column(children: [
                           SizedBox(
-                            height: 10,
+                            height: 8,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          Stack(
                             children: [
-                              Text(
-                                'Next Forecast',
-                                style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w500),
+                              Align(
+                                alignment: Alignment.center,
+                                child: Opacity(
+                                  opacity: 0.25,
+                                  child: Container(
+                                    height: 47,
+                                    width: 343,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xff104084),
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(
+                                              0.2), // Darker shadow color
+                                          spreadRadius: 1,
+                                          blurRadius: 6,
+                                          offset: Offset(0,
+                                              3), // Move the shadow down by 3
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
-                              SizedBox(
-                                width: 47,
+                              Align(
+                                child: Container(
+                                  width: 343,
+                                  height: 47,
+                                  child: Row(children: [
+                                    Flexible(
+                                        flex: 1,
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SvgPicture.asset(
+                                                  'assets/noun-rain-2438520 1.svg'),
+                                              SizedBox(
+                                                width: 5,
+                                              ),
+                                              Text(
+                                                '${inst2.humidity}%',
+                                                style: GoogleFonts.poppins(
+                                                    color: Colors.white),
+                                              ),
+                                            ])),
+                                    Flexible(
+                                        flex: 1,
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SvgPicture.asset(
+                                                  'assets/Group.svg'),
+                                              SizedBox(
+                                                width: 7,
+                                              ),
+                                              Text(
+                                                '${inst2.clouds}%',
+                                                style: GoogleFonts.poppins(
+                                                    color: Colors.white),
+                                              ),
+                                            ])),
+                                    Flexible(
+                                        flex: 1,
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SvgPicture.asset(
+                                                  'assets/noun-wind-4507827 1.svg'),
+                                              SizedBox(
+                                                width: 7,
+                                              ),
+                                              Text(
+                                                '${inst2.windSpeed.toInt()}km/h',
+                                                style: GoogleFonts.poppins(
+                                                    color: Colors.white),
+                                              ),
+                                            ])),
+                                  ]),
+                                ),
                               ),
-                              SvgPicture.asset('assets/calendar.svg'),
                             ],
                           ),
                           SizedBox(
-                            height: 5,
+                            height: 14,
                           ),
-                          DayWeather(),
-                          DayWeather()
-                        ]),
-                      ))
-                    ]),
-                    SizedBox(
-                      height: 15,
+                          Stack(
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: Opacity(
+                                  opacity: 0.25,
+                                  child: Container(
+                                    height: 235,
+                                    width: 343,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xff104084),
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(
+                                              0.2), // Darker shadow color
+                                          spreadRadius: 1,
+                                          blurRadius: 6,
+                                          offset: Offset(0,
+                                              3), // Move the shadow down by 3
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Align(
+                                child: Container(
+                                    height: 220,
+                                    width: 343,
+                                    child: Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Text(
+                                              'Today',
+                                              style: GoogleFonts.poppins(
+                                                  color: Colors.white,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                            SizedBox(
+                                              width: 90,
+                                            ),
+                                            Text(
+                                              'Mar, 10',
+                                              style: GoogleFonts.poppins(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w300),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 15,
+                                        ),
+                                        Row(
+                                          children: [
+                                            HoursWidget(),
+                                            HoursWidget(),
+                                            HoverWidget(),
+                                            HoursWidget(),
+                                          ],
+                                        ),
+                                      ],
+                                    )),
+                              )
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Stack(children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Opacity(
+                                opacity: 0.25,
+                                child: Container(
+                                  height: 170,
+                                  width: 343,
+                                  decoration: BoxDecoration(
+                                    color: Color(0xff104084),
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(
+                                            0.2), // Darker shadow color
+                                        spreadRadius: 1,
+                                        blurRadius: 6,
+                                        offset: Offset(
+                                            0, 3), // Move the shadow down by 3
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Align(
+                                child: Container(
+                              height: 170,
+                              width: 343,
+                              child: Column(children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Text(
+                                      'Next Forecast',
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    SizedBox(
+                                      width: 47,
+                                    ),
+                                    SvgPicture.asset('assets/calendar.svg'),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                DayWeather(),
+                                DayWeather()
+                              ]),
+                            ))
+                          ]),
+                          SizedBox(
+                            height: 15,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -426,7 +461,9 @@ class HoverWidget extends StatelessWidget {
 }
 
 class Header extends StatefulWidget {
-  const Header({super.key});
+  Header({required this.inst2, required this.getdata});
+  Weather inst2;
+  Function(String) getdata;
 
   @override
   State<Header> createState() => _HeaderState();
@@ -437,9 +474,15 @@ class _HeaderState extends State<Header> {
   TextEditingController _searchController = TextEditingController();
   double? width1 = 205;
   double? width2 = 50;
-
   @override
   Widget build(BuildContext context) {
+    String capitalize(String s) {
+      if (s.isEmpty) {
+        return s;
+      }
+      return s[0].toUpperCase() + s.substring(1);
+    }
+
     return Container(
       height: 45,
       margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
@@ -452,10 +495,15 @@ class _HeaderState extends State<Header> {
           SizedBox(
             width: 12,
           ),
-          Text(
-            'Fortaleza',
-            style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w400, color: Colors.white, fontSize: 18),
+          Container(
+            width: 90,
+            child: Text(
+              capitalize(widget.inst2.name),
+              style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white,
+                  fontSize: 18),
+            ),
           ),
           SizedBox(
             width: width1,
@@ -469,7 +517,7 @@ class _HeaderState extends State<Header> {
                 });
                 Future.delayed(Duration(milliseconds: 50), () {
                   setState(() {
-                    width2 = 200;
+                    width2 = 195;
                   });
                 });
               },
@@ -488,7 +536,11 @@ class _HeaderState extends State<Header> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: TextField(
-                onSubmitted: (MediaQuery) {
+                onSubmitted: (MediaQuery) async {
+                  if (_searchController.text.isNotEmpty) {
+                    print('inside');
+                    widget.getdata(_searchController.text);
+                  }
                   setState(() {
                     _isSearching = false;
                     width1 = 205;
@@ -509,7 +561,20 @@ class _HeaderState extends State<Header> {
                   // ),
                   suffixIcon: IconButton(
                     icon: Icon(Icons.close),
-                    onPressed: () {
+                    onPressed: () async {
+                      if (_searchController.text.isNotEmpty) {
+                        // print('Start');
+                        // widget.searchtext = _searchController.text;
+                        // widget.inst = Coord(name: widget.searchtext);
+                        // await widget.inst.get_name();
+                        // widget.inst2 = Weather(
+                        //     name: widget.inst.name,
+                        //     lat: widget.inst.lat,
+                        //     lon: widget.inst.lon,
+                        //     apikey: widget.inst.apikey);
+                        // widget.inst2.get_weather();
+                        // getname1 {setstate{getname}}
+                      }
                       setState(() {
                         _isSearching = false;
                         _searchController.clear();
