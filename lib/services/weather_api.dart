@@ -16,27 +16,31 @@ class Weather {
   int clouds = 0;
   double windSpeed = 0.0;
 
-  // late String hour1;
-  // late int hour1Temp;
-  // late String hour2;
-  // late int hour2Temp;
-  // late String hour3;
-  // late int hour3Temp;
-  // late String hour4;
-  // late int hour4Temp;
+  String month = DateFormat.d().format(DateTime.now());
+  String day = DateFormat.MMMM().format(DateTime.now());
 
-  // late String day1;
-  // late int tempDay1;
-  // late int tempDay1Grey;
-  // late String day2;
-  // late int tempDay2;
-  // late int tempDay2Grey;
+  late String hour1 = '';
+  double hour1Temp = 0.0;
+  late String hour2 = '';
+  double hour2Temp = 0.0;
+  late String hour3 = '';
+  double hour3Temp = 0.0;
+  late String hour4 = '';
+  double hour4Temp = 0.0;
+
+  int i = 0;
+  late String day1 =
+      DateFormat.EEEE().format(DateTime.now().add(Duration(days: 1)));
+  late double tempDay1 = 0.0;
+  late String day2 =
+      DateFormat.EEEE().format(DateTime.now().add(Duration(days: 2)));
+  late double tempDay2 = 0.0;
 
   Weather({required this.name, this.lat, this.lon, this.apikey});
 
   Future<void> get_weather() async {
     try {
-      print('$lon $lat');
+      print('krkr $lon $lat');
       final jsonWeather = await http.get(Uri.parse(
           'https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$apikey&units=metric'));
       Map weatherData = jsonDecode(jsonWeather.body);
@@ -48,13 +52,37 @@ class Weather {
       clouds = weatherData['list'][0]['clouds']['all'];
       windSpeed = weatherData['list'][0]['wind']['speed'];
 
+      hour1 = DateFormat.Hm()
+          .format(DateTime.parse(weatherData['list'][0]['dt_txt']));
+      hour2 = DateFormat.Hm()
+          .format(DateTime.parse(weatherData['list'][1]['dt_txt']));
+      hour3 = DateFormat.Hm()
+          .format(DateTime.parse(weatherData['list'][2]['dt_txt']));
+      hour4 = DateFormat.Hm()
+          .format(DateTime.parse(weatherData['list'][3]['dt_txt']));
 
+      hour1Temp = weatherData['list'][0]['main']['temp'];
+      hour2Temp = weatherData['list'][1]['main']['temp'];
+      hour3Temp = weatherData['list'][2]['main']['temp'];
+      hour4Temp = weatherData['list'][3]['main']['temp'];
 
-      String time = DateFormat().format(DateTime.now());
+      while (day1 !=
+          DateFormat.EEEE()
+              .format(DateTime.parse(weatherData['list'][i]['dt_txt']))) {
+        i += 1;
+      }
+      tempDay1 = weatherData['list'][i]['main']['temp'];
+      while (day2 !=
+          DateFormat.EEEE()
+              .format(DateTime.parse(weatherData['list'][i]['dt_txt']))) {
+        i += 1;
+      }
+      tempDay2 = weatherData['list'][i]['main']['temp'];
+
       print('$windSpeed in $name');
-      print('$time');
+      print('now is $hour1   $month  $day');
     } catch (e) {
-      print('couldnt get weather data');
+      print('couldnt get weather data $e');
     }
   }
 }

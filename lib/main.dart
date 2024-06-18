@@ -23,6 +23,50 @@ class _HomeState extends State<Home> {
   Coord inst = Coord(name: '');
   Weather inst2 = Weather(name: '', lat: 0, lon: 0, apikey: '');
   bool isLoading = false;
+  int lastIndex = 2;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getdata('Alger');
+  }
+
+  void _handleClick(int index) {
+    setState(() {
+      lastIndex = index;
+    });
+  }
+
+  String _getHour(Weather inst2, int index) {
+    switch (index) {
+      case 0:
+        return inst2.hour1;
+      case 1:
+        return inst2.hour2;
+      case 2:
+        return inst2.hour3;
+      case 3:
+        return inst2.hour4;
+      default:
+        return '';
+    }
+  }
+
+  double _getHourTemp(Weather inst2, int index) {
+    switch (index) {
+      case 0:
+        return inst2.hour1Temp;
+      case 1:
+        return inst2.hour2Temp;
+      case 2:
+        return inst2.hour3Temp;
+      case 3:
+        return inst2.hour4Temp;
+      default:
+        return 0;
+    }
+  }
 
   void getdata(String searchController) async {
     print('Start');
@@ -237,7 +281,7 @@ class _HomeState extends State<Home> {
                                               width: 90,
                                             ),
                                             Text(
-                                              'Mar, 10',
+                                              '${inst2.day}, ${inst2.month}',
                                               style: GoogleFonts.poppins(
                                                   color: Colors.white,
                                                   fontSize: 16,
@@ -249,12 +293,28 @@ class _HomeState extends State<Home> {
                                           height: 15,
                                         ),
                                         Row(
-                                          children: [
-                                            HoursWidget(),
-                                            HoursWidget(),
-                                            HoverWidget(),
-                                            HoursWidget(),
-                                          ],
+                                          children: List.generate(
+                                            4,
+                                            (index) => Expanded(
+                                              child: GestureDetector(
+                                                onTap: () =>
+                                                    _handleClick(index),
+                                                child: lastIndex == index
+                                                    ? HoverWidget(
+                                                        hour: _getHour(
+                                                            inst2, index),
+                                                        hourtemp: _getHourTemp(
+                                                            inst2, index),
+                                                      )
+                                                    : HoursWidget(
+                                                        hour: _getHour(
+                                                            inst2, index),
+                                                        hourtemp: _getHourTemp(
+                                                            inst2, index),
+                                                      ),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     )),
@@ -317,8 +377,14 @@ class _HomeState extends State<Home> {
                                 SizedBox(
                                   height: 5,
                                 ),
-                                DayWeather(),
-                                DayWeather()
+                                DayWeather(
+                                  dayx: inst2.day1,
+                                  daytemp: inst2.tempDay1,
+                                ),
+                                DayWeather(
+                                  dayx: inst2.day2,
+                                  daytemp: inst2.tempDay2,
+                                ),
                               ]),
                             ))
                           ]),
@@ -337,9 +403,13 @@ class _HomeState extends State<Home> {
 }
 
 class DayWeather extends StatelessWidget {
-  const DayWeather({
-    super.key,
+  DayWeather({
+    required this.dayx,
+    required this.daytemp,
   });
+
+  String dayx;
+  double daytemp;
 
   @override
   Widget build(BuildContext context) {
@@ -348,22 +418,22 @@ class DayWeather extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            'Monday',
+            '${dayx}',
             style: GoogleFonts.poppins(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.w400),
           ),
-          SizedBox(
-            width: 28,
+          Expanded(
+            child: Container(),
           ),
           SvgPicture.asset(
             'assets/Design sans titre (1).svg',
             width: 60,
           ),
-          SizedBox(
-            width: 51,
+          Expanded(
+            child: Container(),
           ),
           Text(
-            '31°C',
+            '${daytemp.toInt()}°C',
             style: GoogleFonts.poppins(
                 color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400),
           ),
@@ -371,7 +441,7 @@ class DayWeather extends StatelessWidget {
             width: 11,
           ),
           Text(
-            '31°C',
+            '${daytemp.toInt()}°C',
             style: GoogleFonts.poppins(
                 color: Colors.white.withOpacity(0.6),
                 fontSize: 16,
@@ -384,9 +454,10 @@ class DayWeather extends StatelessWidget {
 }
 
 class HoursWidget extends StatelessWidget {
-  const HoursWidget({
-    super.key,
-  });
+  HoursWidget({required this.hour, required this.hourtemp});
+
+  String hour;
+  double hourtemp;
 
   @override
   Widget build(BuildContext context) {
@@ -395,7 +466,7 @@ class HoursWidget extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            '31°C',
+            '${hourtemp.toInt()}°C',
             style: GoogleFonts.poppins(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.w400),
           ),
@@ -403,7 +474,7 @@ class HoursWidget extends StatelessWidget {
             'assets/Design sans titre (1).svg',
             width: 85,
           ),
-          Text('15.00',
+          Text('${hour}',
               style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontSize: 18,
@@ -415,9 +486,10 @@ class HoursWidget extends StatelessWidget {
 }
 
 class HoverWidget extends StatelessWidget {
-  const HoverWidget({
-    super.key,
-  });
+  HoverWidget({required this.hour, required this.hourtemp});
+
+  String hour;
+  double hourtemp;
 
   @override
   Widget build(BuildContext context) {
@@ -441,7 +513,7 @@ class HoverWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            '31°C',
+            '${hourtemp.toInt()}°C',
             style: GoogleFonts.poppins(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.w400),
           ),
@@ -449,7 +521,7 @@ class HoverWidget extends StatelessWidget {
             'assets/Design sans titre (1).svg',
             width: 85,
           ),
-          Text('15.00',
+          Text('${hour}',
               style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontSize: 18,
