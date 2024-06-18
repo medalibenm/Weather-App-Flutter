@@ -80,7 +80,7 @@ class Weather {
       tempDay2 = weatherData['list'][i]['main']['temp'];
 
       print('$windSpeed in $name');
-      print('now is $hour1   $month  $day');
+      print('now is $hour1   $month  $day $description');
     } catch (e) {
       print('couldnt get weather data $e');
     }

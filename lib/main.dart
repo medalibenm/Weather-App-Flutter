@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:real_weather_app/services/coordonnees.dart';
@@ -68,6 +69,27 @@ class _HomeState extends State<Home> {
     }
   }
 
+  String getpicture(String desc) {
+    switch (desc) {
+      case 'Clear':
+        return 'assets/Design sans titre (6).png';
+      case 'Thunderstorm':
+        return 'assets/rain.png';
+      case 'Drizzle':
+        return 'assets/rain.png';
+      case 'Rain':
+        return 'assets/rain.png';
+      case 'Snow':
+        return 'assets/snow.png';
+      case 'Atmosphere':
+        return 'assets/mist.png';
+      case 'Clouds':
+        return 'assets/Design sans titre (9).png';
+      default:
+        return 'assets/Design sans titre (6).png';
+    }
+  }
+
   void getdata(String searchController) async {
     print('Start');
     setState(() {
@@ -113,7 +135,7 @@ class _HomeState extends State<Home> {
                       child: Column(
                         children: [
                           Image.asset(
-                            'assets/Design sans titre (6).png',
+                            getpicture(inst2.description),
                             width: 300,
                             fit: BoxFit.contain,
                           ),
@@ -305,12 +327,14 @@ class _HomeState extends State<Home> {
                                                             inst2, index),
                                                         hourtemp: _getHourTemp(
                                                             inst2, index),
+                                                        desc: inst2.description,
                                                       )
                                                     : HoursWidget(
                                                         hour: _getHour(
                                                             inst2, index),
                                                         hourtemp: _getHourTemp(
                                                             inst2, index),
+                                                        desc: inst2.description,
                                                       ),
                                               ),
                                             ),
@@ -454,10 +478,32 @@ class DayWeather extends StatelessWidget {
 }
 
 class HoursWidget extends StatelessWidget {
-  HoursWidget({required this.hour, required this.hourtemp});
+  HoursWidget({required this.hour, required this.hourtemp, required this.desc});
 
   String hour;
   double hourtemp;
+  String desc;
+
+  String getsmallpicture(String desc) {
+    switch (desc) {
+      case 'Clear':
+        return 'assets/onepng.png';
+      case 'Thunderstorm':
+        return 'assets/Big rain drops.png';
+      case 'Drizzle':
+        return 'assets/Big rain drops.png';
+      case 'Rain':
+        return 'assets/Big rain drops.png';
+      case 'Snow':
+        return 'assets/Big rain drops.png';
+      case 'Atmosphere':
+        return 'assets/Big rain drops.png';
+      case 'Clouds':
+        return 'assets/Design sans titre (11).png';
+      default:
+        return 'assets/onepng.png';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -470,9 +516,10 @@ class HoursWidget extends StatelessWidget {
             style: GoogleFonts.poppins(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.w400),
           ),
-          SvgPicture.asset(
-            'assets/Design sans titre (1).svg',
+          Image.asset(
+            getsmallpicture(desc),
             width: 85,
+            height: 85,
           ),
           Text('${hour}',
               style: GoogleFonts.poppins(
@@ -486,10 +533,32 @@ class HoursWidget extends StatelessWidget {
 }
 
 class HoverWidget extends StatelessWidget {
-  HoverWidget({required this.hour, required this.hourtemp});
+  HoverWidget({required this.hour, required this.hourtemp, required this.desc});
 
   String hour;
   double hourtemp;
+  String desc;
+
+  String getsmallpicture(String desc) {
+    switch (desc) {
+      case 'Clear':
+        return 'assets/onepng.png';
+      case 'Thunderstorm':
+        return 'assets/Big rain drops.png';
+      case 'Drizzle':
+        return 'assets/Big rain drops.png';
+      case 'Rain':
+        return 'assets/Big rain drops.png';
+      case 'Snow':
+        return 'assets/Big rain drops.png';
+      case 'Atmosphere':
+        return 'assets/Big rain drops.png';
+      case 'Clouds':
+        return 'assets/Design sans titre (11).png';
+      default:
+        return 'assets/onepng.png';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -517,10 +586,18 @@ class HoverWidget extends StatelessWidget {
             style: GoogleFonts.poppins(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.w400),
           ),
-          SvgPicture.asset(
-            'assets/Design sans titre (1).svg',
-            width: 85,
+          // SvgPicture.asset(
+          //   'assets/Design sans titre (1).svg',
+          //   width: 85,
+          //   height: 85,
+          // ),
+
+          Image.asset(
+            getsmallpicture(desc),
+            width: 75,
+            height: 85,
           ),
+
           Text('${hour}',
               style: GoogleFonts.poppins(
                   color: Colors.white,
@@ -567,8 +644,7 @@ class _HeaderState extends State<Header> {
           SizedBox(
             width: 12,
           ),
-          Container(
-            width: 90,
+          Expanded(
             child: Text(
               capitalize(widget.inst2.name),
               style: GoogleFonts.poppins(
@@ -576,9 +652,6 @@ class _HeaderState extends State<Header> {
                   color: Colors.white,
                   fontSize: 18),
             ),
-          ),
-          SizedBox(
-            width: width1,
           ),
           if (!_isSearching)
             InkWell(
@@ -658,6 +731,9 @@ class _HeaderState extends State<Header> {
                 ),
               ),
             ),
+          SizedBox(
+            width: 23,
+          )
         ],
       ),
     );
