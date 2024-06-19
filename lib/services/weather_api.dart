@@ -15,6 +15,7 @@ class Weather {
   int humidity = 0;
   int clouds = 0;
   double windSpeed = 0.0;
+  bool isDayTime = true;
 
   String month = DateFormat.d().format(DateTime.now());
   String day = DateFormat.MMMM().format(DateTime.now());
@@ -28,6 +29,7 @@ class Weather {
   late String hour4 = '';
   double hour4Temp = 0.0;
 
+
   int i = 0;
   late String day1 =
       DateFormat.EEEE().format(DateTime.now().add(Duration(days: 1)));
@@ -35,6 +37,7 @@ class Weather {
   late String day2 =
       DateFormat.EEEE().format(DateTime.now().add(Duration(days: 2)));
   late double tempDay2 = 0.0;
+  
 
   Weather({required this.name, this.lat, this.lon, this.apikey});
 
@@ -79,10 +82,13 @@ class Weather {
       }
       tempDay2 = weatherData['list'][i]['main']['temp'];
 
+      isDayTime = int.parse(hour1.substring(0, 1)) > 6 && int.parse(hour1.substring(0, 1)) < 20 ? true : false;
+
       print('$windSpeed in $name');
-      print('now is $hour1   $month  $day $description');
+      print('now is $hour1   $month  $day $description $isDayTime');
     } catch (e) {
       print('couldnt get weather data $e');
+
     }
   }
 }
